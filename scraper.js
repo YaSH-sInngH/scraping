@@ -1,141 +1,8 @@
 import puppeteer from 'puppeteer';
 import { getProductModel } from './models/Product.js';
 import './db.js';
-
-// Category-specific selectors with fallbacks
-const selectors = {
-  'Mobiles': { 
-    card: 'a.CGtC98', 
-    title: 'div.KzDlHZ', 
-    price: 'div.Nx9bqj._4b5DiR', 
-    rating: 'div.XQDdHH',
-    fallbackCard: 'div[data-id]'
-  },
-  'Laptops': { 
-    card: 'a.CGtC98', 
-    title: 'div.KzDlHZ', 
-    price: 'div.Nx9bqj._4b5DiR', 
-    rating: 'div.XQDdHH',
-    fallbackCard: 'div[data-id]'
-  },
-  'Men Clothing': { 
-    card: 'div.cPHDOP.col-12-12', 
-    title: 'a.WKTcLC', 
-    price: 'div.Nx9bqj', 
-    rating: 'div.XQDdHH',
-    fallbackCard: 'div[data-id]'
-  },
-  'Women Clothing': { 
-    card: 'div.cPHDOP.col-12-12', 
-    title: 'a.WKTcLC', 
-    price: 'div.Nx9bqj', 
-    rating: 'div.XQDdHH',
-    fallbackCard: 'div[data-id]'
-  },
-  'Appliances': { 
-    card: 'div.cPHDOP.col-12-12', 
-    title: 'a.wjcEIp', 
-    price: 'div.Nx9bqj', 
-    rating: 'div.XQDdHH',
-    fallbackCard: 'div[data-id]'
-  },
-  'Home & Kitchen': { 
-    card: 'div.cPHDOP.col-12-12', 
-    title: 'a.wjcEIp', 
-    price: 'div.Nx9bqj', 
-    rating: 'div.XQDdHH',
-    fallbackCard: 'div[data-id]'
-  },
-  'TVs': { 
-    card: 'a.CGtC98', 
-    title: 'div.KzDlHZ', 
-    price: 'div.Nx9bqj._4b5DiR', 
-    rating: 'div.XQDdHH',
-    fallbackCard: 'div[data-id]'
-  },
-  'Refrigerators': { 
-    card: 'a.CGtC98', 
-    title: 'div.KzDlHZ', 
-    price: 'div.Nx9bqj._4b5DiR', 
-    rating: 'div.XQDdHH',
-    fallbackCard: 'div[data-id]'
-  },
-  'Washing Machines': { 
-    card: 'a.CGtC98', 
-    title: 'div.KzDlHZ', 
-    price: 'div.Nx9bqj._4b5DiR', 
-    rating: 'div.XQDdHH',
-    fallbackCard: 'div[data-id]'
-  },
-  'Air Conditioners': { 
-    card: 'a.CGtC98', 
-    title: 'div.KzDlHZ', 
-    price: 'div.Nx9bqj._4b5DiR', 
-    rating: 'div.XQDdHH',
-    fallbackCard: 'div[data-id]'
-  },
-  'Headphones': { 
-    card: 'div._1AtVbE.col-12-12', 
-    title: 'a.wjcEIp', 
-    price: 'div.Nx9bqj', 
-    rating: 'div.XQDdHH',
-    fallbackCard: 'div[data-id]',
-    specialCase: true
-  },
-  'Smart Watches': { 
-    card: 'div.cPHDOP.col-12-12', 
-    title: 'a.WKTcLC', 
-    price: 'div.Nx9bqj', 
-    rating: 'div.XQDdHH',
-    fallbackCard: 'div[data-id]'
-  },
-  'Shoes': { 
-    card: 'div._1sdMkc.LFEi7Z', 
-    title: 'a.WKTcLC', 
-    price: 'div.Nx9bqj', 
-    rating: 'div.XQDdHH',
-    fallbackCard: 'div[data-id]',
-    specialCase: true
-  },
-  'Bags': { 
-    card: 'div._1sdMkc.LFEi7Z', 
-    title: 'a.WKTcLC', 
-    price: 'div.Nx9bqj', 
-    rating: 'div.XQDdHH',
-    fallbackCard: 'div[data-id]',
-    specialCase: true
-  },
-  'Toys': { 
-    card: 'div._1AtVbE.col-12-12', 
-    title: 'a.wjcEIp', 
-    price: 'div.Nx9bqj', 
-    rating: 'div.XQDdHH',
-    fallbackCard: 'div[data-id]'
-  },
-  'Books': {
-    card: 'div._1AtVbE.col-12-12',
-    title: 'a.wjcEIp',
-    price: 'div.Nx9bqj',
-    rating: 'div.XQDdHH',
-    author: 'div.NqpwHC',
-    fallbackCard: 'div[data-id]',
-    specialCase: false
-  },
-  'Gaming Consoles': { 
-    card: 'div.cPHDOP.col-12-12', 
-    title: 'a.wjcEIp', 
-    price: 'div.Nx9bqj', 
-    rating: 'div.XQDdHH',
-    fallbackCard: 'div[data-id]'
-  },
-  'Tablets': { 
-    card: 'a.CGtC98', 
-    title: 'div.KzDlHZ', 
-    price: 'div.Nx9bqj._4b5DiR', 
-    rating: 'div.XQDdHH',
-    fallbackCard: 'div[data-id]'
-  },
-};
+import fs from 'fs';
+import path from 'path';
 
 // Function to detect pagination type
 async function detectPaginationType(page) {
@@ -194,11 +61,18 @@ async function findWorkingSelectors(page, categoryName) {
     'div._1AtVbE',
     'div.cPHDOP',
     'a.CGtC98',
-    'div._1sdMkc'
+    'div._1sdMkc',
+    'div.slAVV4.qt3Pmj' // Keep this specific selector
   ];
 
   const foundSelectors = await page.evaluate((selectors) => {
     const results = {};
+    // Prioritize data-id if present and has products, as it's a common and reliable fallback
+    const dataIdElements = document.querySelectorAll('div[data-id]');
+    if (dataIdElements.length > 5) { 
+      results['div[data-id]'] = dataIdElements.length;
+    }
+
     selectors.forEach(selector => {
       const elements = document.querySelectorAll(selector);
       if (elements.length > 0) {
@@ -231,7 +105,7 @@ async function handleInfiniteScroll(page, maxScrolls = 10) {
   let previousProductCount = 0;
   
   while (scrollCount < maxScrolls) {
-    // Get current product count
+    // Get current product count, preferring data-id as a robust product card identifier
     const currentProductCount = await page.evaluate(() => {
       return document.querySelectorAll('div[data-id]').length;
     });
@@ -247,7 +121,7 @@ async function handleInfiniteScroll(page, maxScrolls = 10) {
     
     // Check if new products were loaded
     const newProductCount = await page.evaluate(() => {
-      return document.querySelectorAll('div[data-id]').length;
+      return document.querySelectorAll('div[data-tkid]').length;
     });
     
     if (newProductCount === currentProductCount && currentProductCount === previousProductCount) {
@@ -262,6 +136,293 @@ async function handleInfiniteScroll(page, maxScrolls = 10) {
   console.log(`Infinite scroll completed after ${scrollCount} scrolls`);
 }
 
+export async function fetchCategories() {
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: ['--no-sandbox', '--disable-setuid-sandbox']
+  });
+  const page = await browser.newPage();
+  await page.setUserAgent(
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'
+  );
+
+  let categoryObject = {}; // Declare categoryObject here
+
+  try {
+    console.log('Navigating to Flipkart homepage to fetch categories...');
+    await page.goto('https://www.flipkart.com', {
+      waitUntil: 'networkidle2',
+      timeout: 30000
+    });
+
+    // Close login popup if present
+    try {
+      await page.waitForSelector('button._2KpZ6l._2doB4z', { timeout: 5000 });
+      await page.click('button._2KpZ6l._2doB4z');
+      console.log('Closed login popup');
+    } catch (e) {
+      console.log('Login popup not found or already closed.');
+    }
+
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    const categories = await page.evaluate(() => {
+      let catNodes = [];
+
+      const horizontalContainers = Array.from(document.querySelectorAll('div[style*="display: flex"], div[class*="flex"], nav, header'));
+
+      const possibleNavbars = horizontalContainers.filter(container => {
+        const children = container.children;
+        return children.length >= 5 &&
+               Array.from(children).every(child =>
+                 Math.abs(child.getBoundingClientRect().height - children[0].getBoundingClientRect().height) < 20
+               ) &&
+               container.getBoundingClientRect().width > window.innerWidth * 0.7;
+      });
+      for (const navbar of possibleNavbars) {
+        const items = Array.from(navbar.children);
+
+        const itemsWithImages = items.filter(item => item.querySelector('img'));
+        if (itemsWithImages.length >= 5) {
+          catNodes = items;
+          console.log('Found navbar with image items:', items.length);
+          break;
+        }
+      }
+
+      if (catNodes.length === 0) {
+        catNodes = Array.from(
+          document.querySelectorAll('div._3sdu8W.emupdz > a._1ch8e_, div._3sdu8W.emupdz > div._1ch8e_')
+        );
+
+        if (catNodes.length === 0 || catNodes.length < 8) {
+          const navContainer = document.querySelector('div[class*="navigationCard"]')?.parentElement?.parentElement;
+          if (navContainer) {
+            catNodes = Array.from(navContainer.querySelectorAll('a[class*="navigationCard"], div[class*="navigationCard"]'));
+          }
+
+          if (catNodes.length === 0 || catNodes.length < 8) {
+            catNodes = Array.from(document.querySelectorAll('a[href*="navigationCard"], div[class*="rich_navigation"]'));
+          }
+
+          if (catNodes.length === 0 || catNodes.length < 8) {
+            const possibleContainers = Array.from(document.querySelectorAll('div[style*="display: flex"]'));
+            for (const container of possibleContainers) {
+              const items = container.querySelectorAll('a, div');
+              if (items.length >= 8 && Array.from(items).every(item => item.querySelector('img'))) {
+                catNodes = Array.from(items);
+                break;
+              }
+            }
+          }
+        }
+      }
+
+      const baseUrl = 'https://www.flipkart.com';
+      const results = [];
+
+      catNodes.forEach(node => {
+        let name = null;
+
+        const nameSpan = node.querySelector('span[class*="XjE3T"] > span, span[class*="text"] > span, div > span');
+        if (nameSpan) {
+          name = nameSpan.textContent.trim();
+        } else {
+          name = node.getAttribute('aria-label') ||
+                 node.getAttribute('title') ||
+                 node.textContent.trim();
+        }
+
+        if (name && name.length > 50) {
+          name = name.substring(0, 50).trim();
+        }
+
+        const relativeUrl = node.tagName === 'A' ? node.getAttribute('href') : null;
+        const url = relativeUrl ? new URL(relativeUrl, baseUrl).href : null;
+
+        const img = node.querySelector('img')?.src || null;
+
+        if (name) {
+          results.push({ name, url, img });
+        }
+      });
+
+      console.log(`Found ${results.length} categories`);
+
+      if (results.length < 8) {
+        console.log('Not enough categories found, trying alternative approach');
+
+        const allImages = document.querySelectorAll('img');
+        for (const img of allImages) {
+          if (img.width > 30 && img.width < 150 && img.height > 30 && img.height < 150) {
+            let parent = img.parentElement;
+            for (let i = 0; i < 5; i++) {
+              if (!parent) break;
+
+              const text = parent.textContent.trim();
+              if (text && text.length < 30) {
+                const link = parent.tagName === 'A' ? parent : parent.querySelector('a');
+                const url = link ? (link.href || null) : null;
+
+                const name = text;
+                if (name && !results.some(r => r.name === name)) {
+                  results.push({ name, url, img: img.src });
+                }
+
+                break;
+              }
+
+              parent = parent.parentElement;
+            }
+          }
+        }
+
+        console.log(`After alternative approach, found ${results.length} categories`);
+      }
+
+      if (results.length < 8) {
+        console.log('Still not enough categories, trying final approach');
+
+        const navElements = document.querySelectorAll('nav, [role="navigation"], header, [class*="menu"], [class*="nav"]');
+
+        for (const nav of navElements) {
+          const items = nav.querySelectorAll('a, li, div[role="button"], [class*="item"]');
+
+          if (items.length >= 5) {
+            for (const item of items) {
+
+              const text = item.textContent.trim();
+              if (text && text.length > 2 && text.length < 30) { // Reasonable length for a category name
+                const link = item.tagName === 'A' ? item : item.querySelector('a');
+                const url = link ? (link.href || null) : null;
+
+                const img = item.querySelector('img')?.src || null;
+
+                const name = text;
+                if (name && !results.some(r => r.name === name)) {
+                  results.push({ name, url, img });
+                }
+              }
+            }
+          }
+        }
+
+        console.log(`After final approach, found ${results.length} categories`);
+      }
+
+      if (results.length < 8) {
+        console.log('Using hardcoded categories as last resort');
+
+        const hardcodedCategories = [
+          {
+            name: 'Minutes',
+            url: 'https://www.flipkart.com/flipkart-minutes-store?marketplace=HYPERLOCAL&fm=neo%2Fmerchandising&iid=M_498ef42f-84a9-44dc-bfa0-b5c50b6a1108_2_X1NCR146KC29_MC.HPVQFYHAHC9Q&otracker=hp_rich_navigation_1_2.navigationCard.RICH_NAVIGATION_Minutes_HPVQFYHAHC9Q&otracker1=hp_rich_navigation_PINNED_neo%2Fmerchandising_NA_NAV_EXPANDABLE_navigationCard_cc_1_L0_view-all&cid=HPVQFYHAHC9Q',
+            img: 'https://rukminim2.flixcart.com/fk-p-flap/128/128/image/a22a213ca6221b65.png?q=100'
+          },
+          {
+            name: 'Mobiles & Tablets',
+            url: 'https://www.flipkart.com/mobile-phones-store?param=4111&fm=neo%2Fmerchandising&iid=M_498ef42f-84a9-44dc-bfa0-b5c50b6a1108_2_X1NCR146KC29_MC.AH1NTIJZ241Z&otracker=hp_rich_navigation_2_2.navigationCard.RICH_NAVIGATION_Mobiles%2B%26%2BTablets_AH1NTIJZ241Z&otracker1=hp_rich_navigation_PINNED_neo%2Fmerchandising_NA_NAV_EXPANDABLE_navigationCard_cc_2_L0_view-all&cid=AH1NTIJZ241Z',
+            img: 'https://rukminim2.flixcart.com/fk-p-flap/128/128/image/5f2ee7f883cdb774.png?q=100'
+          },
+          {
+            name: 'Fashion',
+            url: 'https://www.flipkart.com/clothing-and-accessories/pr?sid=clo',
+            img: 'https://rukminim2.flixcart.com/fk-p-flap/128/128/image/ff559cb9d803d424.png?q=100'
+          },
+          {
+            name: 'Electronics',
+            url: 'https://www.flipkart.com/electronics-store',
+            img: 'https://rukminim2.flixcart.com/fk-p-flap/128/128/image/af646c36d74c4be9.png?q=100'
+          },
+          {
+            name: 'Home & Furniture',
+            url: 'https://www.flipkart.com/home-furnishing/pr?sid=jra',
+            img: 'https://rukminim2.flixcart.com/fk-p-flap/128/128/image/1788f177649e6991.png?q=100'
+          },
+          {
+            name: 'TVs & Appliances',
+            url: 'https://www.flipkart.com/fk-sasalele-sale-tv-and-appliances-may25-at-store?param=3783&fm=neo%2Fmerchandising&iid=M_498ef42f-84a9-44dc-bfa0-b5c50b6a1108_2_X1NCR146KC29_MC.YX88A89LFA7C&otracker=hp_rich_navigation_6_2.navigationCard.RICH_NAVIGATION_TVs%2B%26%2BAppliances_YX88A89LFA7C&otracker1=hp_rich_navigation_PINNED_neo%2Fmerchandising_NA_NAV_EXPANDABLE_navigationCard_cc_6_L0_view-all&cid=YX88A89LFA7C',
+            img: 'https://rukminim2.flixkart.com/fk-p-flap/128/128/image/e90944802d996756.jpg?q=100'
+          },
+          {
+            name: 'Flight Bookings',
+            url: 'https://www.flipkart.com/travel/flights?param=bsd-2025-booknow&fm=neo%2Fmerchandising&iid=M_498ef42f-84a9-44dc-bfa0-b5c50b6a1108_2_X1NCR146KC29_MC.LE8A9JOLY9F3&otracker=hp_rich_navigation_7_2.navigationCard.RICH_NAVIGATION_Flight%2BBookings_LE8A9JOLY9F3&otracker1=hp_rich_navigation_PINNED_neo%2Fmerchandising_NA_NAV_EXPANDABLE_navigationCard_cc_7_L0_view-all&cid=LE8A9JOLY9F3',
+            img: null
+          },
+          {
+            name: 'Beauty, Food..',
+            url: 'https://www.flipkart.com/beauty-and-grooming/pr?sid=g9b',
+            img: null
+          },
+          {
+            name: 'Grocery',
+            url: 'https://www.flipkart.com/grocery-supermart-store?marketplace=GROCERY&fm=neo%2Fmerchandising&iid=M_498ef42f-84a9-44dc-bfa0-b5c50b6a1108_2_X1NCR146KC29_MC.XO8YX5A5U8SC&otracker=hp_rich_navigation_9_2.navigationCard.RICH_NAVIGATION_Grocery_XO8YX5A5U8SC&otracker1=hp_rich_navigation_PINNED_neo%2Fmerchandising_NA_NAV_EXPANDABLE_navigationCard_cc_9_L0_view-all&cid=XO8YX5A5U8SC',
+            img: null
+          }
+        ];
+
+        for (const cat of hardcodedCategories) {
+          const existingCat = results.find(r => r.name === cat.name);
+          if (!existingCat) {
+
+            results.push(cat);
+          } else {
+            if (!existingCat.url && cat.url) {
+              existingCat.url = cat.url;
+            }
+            if (!existingCat.img && cat.img) {
+              existingCat.img = cat.img;
+            }
+          }
+        }
+
+        console.log(`After adding hardcoded categories, found ${results.length} categories`);
+      }
+
+      return results;
+    });
+
+    const filePath = path.resolve('dynamicCategoryMapping.json');
+
+    categoryObject = {};
+    categories.forEach(category => {
+      categoryObject[category.name] = category;
+    });
+
+      if (categoryObject['Fashion'] && !categoryObject['Fashion'].url) {
+        categoryObject['Fashion'].url = 'https://www.flipkart.com/clothing-and-accessories/pr?sid=clo';
+      }
+      if (categoryObject['Electronics'] && !categoryObject['Electronics'].url) {
+        categoryObject['Electronics'].url = 'https://www.flipkart.com/electronics-store';
+      }
+      if (categoryObject['Home & Furniture'] && !categoryObject['Home & Furniture'].url) {
+        categoryObject['Home & Furniture'].url = 'https://www.flipkart.com/home-furnishing/pr?sid=jra';
+      }
+      if (categoryObject['Beauty, Food..'] && !categoryObject['Beauty, Food..'].url) {
+        categoryObject['Beauty, Food..'].url = 'https://www.flipkart.com/beauty-and-grooming/pr?sid=g9b';
+      }
+
+      for (const catName in categoryObject) {
+        if (categoryObject[catName].url) {
+
+          categoryObject[catName].url = categoryObject[catName].url.replace(/`/g, '').trim();
+        }
+        if (categoryObject[catName].img) {
+          categoryObject[catName].img = categoryObject[catName].img.replace(/`/g, '').trim();
+        }
+      }
+
+     fs.writeFileSync(filePath, JSON.stringify(categoryObject, null, 2));
+
+    console.log(`✅ ${Object.keys(categoryObject).length} categories scraped and saved to ${filePath}`);
+  } catch (error) {
+    console.error('❌ Scraping failed:', error);
+  } finally {
+    await browser.close();
+  }
+  return Object.values(categoryObject); // Return as array for consistency with original function
+}
+
 export default async function scrapeCategory(categoryUrl, categoryName) {
   const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
@@ -271,12 +432,88 @@ export default async function scrapeCategory(categoryUrl, categoryName) {
   let hasNextPage = true;
   let totalProductsScraped = 0;
   const maxPages = 50; // Safety limit to prevent infinite loops
-  let { card, title, price, rating, specialCase, fallbackCard } = selectors[categoryName] || selectors['Mobiles'];
+  
+  // Load selectors from the file, or use a default empty object
+  let categorySelectors = {};
+  try {
+    const data = fs.readFileSync(path.resolve('categorySelectors.json'), 'utf-8');
+    categorySelectors = JSON.parse(data);
+  } catch (error) {
+    console.log('categorySelectors.json not found, using default selectors. Run `npm run find-selectors` to generate it.');
+  }
+
+  let { card, title, price, rating, specialCase, fallbackCard } = categorySelectors[categoryName] || {};
+
+  const subCategoryMappingPath = path.resolve('dynamicSubCategoryMapping.json');
+  let dynamicSubCategoryMapping = {};
+  try {
+    dynamicSubCategoryMapping = JSON.parse(fs.readFileSync(subCategoryMappingPath, 'utf-8'));
+  } catch (error) {
+    console.log('dynamicSubCategoryMapping.json not found. It will be created.');
+  }
 
   try {
-    while (hasNextPage && currentPage <= maxPages) {
-    // Compose page URL for pagination
-    const pageUrl = `${categoryUrl}&page=${currentPage}`;
+    // Scrape subcategories first
+    await page.goto(categoryUrl, { waitUntil: 'networkidle2', timeout: 60000 });
+    // Close login popup if present
+    try {
+      await page.waitForSelector('button._2KpZ6l._2doB4z', { timeout: 5000 });
+      await page.click('button._2KpZ6l._2doB4z');
+      console.log('Closed login popup');
+    } catch (e) {
+      // No popup found, continue
+    }
+
+    const subcategories = await page.evaluate(() => {
+      let links = Array.from(document.querySelectorAll('section.Iu4qXa a.uWfXeF, section.Iu4qXa a.hEjLuS.WyLc0s'));
+      if (links.length === 0) {
+        links = Array.from(document.querySelectorAll('a[title][href*="pr?sid="]'));
+      }
+      return links.map(a => ({
+        name: a.getAttribute('title') || a.textContent.trim(),
+        url: a.href
+      })).filter(sub => sub.name && sub.url);
+    });
+
+    if (subcategories.length > 0) {
+      console.log(`Found ${subcategories.length} subcategories for ${categoryName}.`);
+      dynamicSubCategoryMapping[categoryName] = subcategories;
+      fs.writeFileSync(subCategoryMappingPath, JSON.stringify(dynamicSubCategoryMapping, null, 2));
+
+      for (const sub of subcategories) {
+        console.log(`Scraping subcategory: ${sub.name} from ${sub.url}`);
+        // Recursively call scrapeCategory for subcategories, or a dedicated product scraper
+        await scrapeProductsForUrl(sub.url, sub.name, Product, page, categorySelectors);
+      }
+    } else {
+      console.log(`No subcategories found for ${categoryName}, scraping products directly.`);
+      dynamicSubCategoryMapping[categoryName] = []; // Ensure the category has an entry even if no subcategories
+      fs.writeFileSync(subCategoryMappingPath, JSON.stringify(dynamicSubCategoryMapping, null, 2));
+      await scrapeProductsForUrl(categoryUrl, categoryName, Product, page, categorySelectors);
+    }
+
+    console.log(`\n=== ${categoryName} Scraping Complete ===`);
+    console.log(`Total pages scraped: ${currentPage - 1}`); // This will be inaccurate if subcategories are scraped
+    console.log(`Total products scraped: ${totalProductsScraped}`); // This will also be inaccurate
+    console.log(`==========================================\n`);
+
+  } catch (error) {
+    console.error(`Error scraping ${categoryName}:`, error.message);
+  } finally {
+    await browser.close();
+  }
+}
+
+async function scrapeProductsForUrl(url, name, ProductModel, page, categorySelectors) {
+  let currentPage = 1;
+  let hasNextPage = true;
+  let productsScrapedCount = 0;
+  const maxPages = 50; // Safety limit
+  
+  let { card, title, price, rating, specialCase, fallbackCard } = categorySelectors[name] || {};
+
+  while (hasNextPage && currentPage <= maxPages) {
+    const pageUrl = `${url}&page=${currentPage}`;
     console.log(`Navigating to ${pageUrl}`);
     await page.goto(pageUrl, { waitUntil: 'networkidle2', timeout: 60000 });
 
@@ -284,250 +521,218 @@ export default async function scrapeCategory(categoryUrl, categoryName) {
     try {
       await page.waitForSelector('button._2KpZ6l._2doB4z', { timeout: 5000 });
       await page.click('button._2KpZ6l._2doB4z');
-        console.log('Closed login popup');
-      } catch (e) {
-        // No popup found, continue
-      }
+      console.log('Closed login popup');
+    } catch (e) {
+      // No popup found, continue
+    }
 
-      // Detect pagination type and handle accordingly
-      const paginationType = await detectPaginationType(page);
-      
-      if (paginationType.type === 'infinite-scroll') {
-        // Handle infinite scroll
-        await handleInfiniteScroll(page);
-      } else {
-        // Traditional pagination - scroll to bottom to trigger lazy loading
-    let previousHeight;
-    do {
-      previousHeight = await page.evaluate('document.body.scrollHeight');
-      await page.evaluate('window.scrollTo(0, document.body.scrollHeight)');
-      await new Promise(res => setTimeout(res, 1000));
-    } while (
-      await page.evaluate('document.body.scrollHeight') > previousHeight
-    );  
-      }
+    const paginationType = await detectPaginationType(page);
 
-      // Try to find working selectors if the default one fails
-      let cardSelector = card;
-      try {
-        await page.waitForSelector(card, { timeout: 10000 });
-      } catch (e) {
-        console.log(`Default selector '${card}' not found, trying fallback...`);
-        cardSelector = await findWorkingSelectors(page, categoryName);
-        console.log(`Using fallback selector: ${cardSelector}`);
-      }
+    if (paginationType.type === 'infinite-scroll') {
+      await handleInfiniteScroll(page);
+    } else {
+      let previousHeight;
+      do {
+        previousHeight = await page.evaluate('document.body.scrollHeight');
+        await page.evaluate('window.scrollTo(0, document.body.scrollHeight)');
+        await new Promise(res => setTimeout(res, 1000));
+      } while (
+        await page.evaluate('document.body.scrollHeight') > previousHeight
+      );
+    }
 
-      let products = [];
-      
-      // Try different scraping strategies
-      try {
-    if (["Men Clothing", "Women Clothing", "Home & Kitchen", "Appliances"].includes(categoryName)) {
-      products = await page.evaluate(() => {
-        const rows = Array.from(document.querySelectorAll('div.cPHDOP.col-12-12'));
-        let allProducts = [];
-        for (const row of rows) {
-          const cards = Array.from(row.querySelectorAll('div[data-id]'));
-          for (const card of cards) {
-            // Title
-            const titleEl = card.querySelector('a.WKTcLC, a.wjcEIp');
-                const title = titleEl?.innerText?.trim() || '';
-            // Price
-            const priceEl = card.querySelector('div.Nx9bqj');
-                const price = priceEl?.innerText?.trim() || '';
-            // Rating
-            const ratingEl = card.querySelector('div.XQDdHH');
-                const rating = ratingEl?.innerText?.trim() || '';
-            // URL
+    let cardSelector = card;
+    try {
+      await page.waitForSelector(card, { timeout: 10000 });
+    } catch (e) {
+      console.log(`Default selector '${card}' not found, trying fallback...`);
+      if (!specialCase) {
+        cardSelector = await findWorkingSelectors(page, name);
+      }
+      console.log(`Using fallback selector: ${cardSelector}`);
+    }
+
+    let products = [];
+
+    try {
+      if (["Men Clothing", "Women Clothing", "Home & Kitchen", "Appliances"].includes(name)) {
+        products = await page.evaluate((categoryCardSelector) => {
+          const rows = Array.from(document.querySelectorAll('div.cPHDOP.col-12-12'));
+          let allProducts = [];
+          for (const row of rows) {
+            const cards = Array.from(row.querySelectorAll(categoryCardSelector));
+            for (const card of cards) {
+              const titleEl = card.querySelector('a.WKTcLC, a.wjcEIp');
+              const title = titleEl?.innerText?.trim() || '';
+              const priceEl = card.querySelector('div.Nx9bqj');
+              const price = priceEl?.innerText?.trim() || '';
+              const ratingEl = card.querySelector('div.XQDdHH');
+              const rating = ratingEl?.innerText?.trim() || '';
+              let url = '';
+              if (categoryCardSelector === 'div.slAVV4.qt3Pmj') {
+                const urlEl = card.querySelector('a.VJA3rP');
+                url = urlEl?.getAttribute('href') || '';
+              } else {
+                url = titleEl?.getAttribute('href') || '';
+              }
+
+              if (url && !url.startsWith('http')) {
+                url = 'https://www.flipkart.com' + url;
+              }
+              if (title && price) {
+                allProducts.push({ title, price, rating, url });
+              }
+            }
+          }
+          return allProducts;
+        }, cardSelector);
+      } else if (specialCase) {
+        products = await page.evaluate(({ cardSelector, title, price, rating }) => {
+          const cards = Array.from(document.querySelectorAll(cardSelector));
+          return cards.map(cardEl => {
+            const titleEl = cardEl.querySelector(title);
+            const titleText = titleEl?.innerText?.trim() || '';
+            const priceText = cardEl.querySelector(price)?.innerText?.trim() || '';
+            const ratingText = cardEl.querySelector(rating)?.innerText?.trim() || '';
             let url = titleEl?.getAttribute('href') || '';
             if (url && !url.startsWith('http')) {
               url = 'https://www.flipkart.com' + url;
             }
-            if (title && price) {
-              allProducts.push({ title, price, rating, url });
-            }
-          }
-        }
-        return allProducts;
-      });
-    } else if (specialCase) {
-          // Special handling for categories with unique structure
-          products = await page.evaluate(({ cardSelector, title, price, rating }) => {
-            const cards = Array.from(document.querySelectorAll(cardSelector));
-        return cards.map(cardEl => {
-          const titleEl = cardEl.querySelector(title);
-              const titleText = titleEl?.innerText?.trim() || '';
-              const priceText = cardEl.querySelector(price)?.innerText?.trim() || '';
-              const ratingText = cardEl.querySelector(rating)?.innerText?.trim() || '';
-          let url = titleEl?.getAttribute('href') || '';
-          if (url && !url.startsWith('http')) {
-            url = 'https://www.flipkart.com' + url;
-          }
-          return { title: titleText, price: priceText, rating: ratingText, url };
-        }).filter(p => p.title && p.price);
-          }, { cardSelector, title, price, rating });
-    } else {
-          // Generic scraping for other categories
-          products = await page.evaluate(({ cardSelector, title, price, rating }) => {
-            const cards = Array.from(document.querySelectorAll(cardSelector));
-        return cards.map(cardEl => {
-              const titleText = cardEl.querySelector(title)?.innerText?.trim() || '';
-              const priceText = cardEl.querySelector(price)?.innerText?.trim() || '';
-              const ratingText = cardEl.querySelector(rating)?.innerText?.trim() || '';
-          let url = cardEl.getAttribute('href') || cardEl.href || '';
-          if (url && !url.startsWith('http')) {
-            url = 'https://www.flipkart.com' + url;
-          }
-          return { title: titleText, price: priceText, rating: ratingText, url };
-        }).filter(p => p.title && p.price);
-          }, { cardSelector, title, price, rating });
-        }
-
-        // If no products found, try generic approach
-        if (products.length === 0) {
-          console.log('No products found with specific selectors, trying generic approach...');
-          products = await page.evaluate(() => {
-            const cards = Array.from(document.querySelectorAll('div[data-id]'));
-            return cards.map(cardEl => {
-              // Try multiple title selectors
-              const titleEl = cardEl.querySelector('a.WKTcLC, a.wjcEIp, div.KzDlHZ, a[title]') || cardEl;
-              const titleText = titleEl?.innerText?.trim() || titleEl?.getAttribute('title') || '';
-              
-              // Try multiple price selectors
-              const priceEl = cardEl.querySelector('div.Nx9bqj, div._30jeq3, div._1_WHN1');
-              const priceText = priceEl?.innerText?.trim() || '';
-              
-              // Try multiple rating selectors
-              const ratingEl = cardEl.querySelector('div.XQDdHH, div._3LWZlK, span._2_R_DZ');
-              const ratingText = ratingEl?.innerText?.trim() || '';
-              
-              // Get URL
-              let url = '';
-              if (titleEl && titleEl.tagName === 'A') {
-                url = titleEl.getAttribute('href') || '';
-              } else {
-                const linkEl = cardEl.querySelector('a[href*="/p/"]');
-                url = linkEl?.getAttribute('href') || '';
-              }
-              
-              if (url && !url.startsWith('http')) {
-                url = 'https://www.flipkart.com' + url;
-              }
-              
-              return { title: titleText, price: priceText, rating: ratingText, url };
-            }).filter(p => p.title && p.price);
-          });
-        }
-
-      } catch (error) {
-        console.error(`Error scraping products for ${categoryName}:`, error.message);
-        products = [];
-    }
-
-    console.log(`Scraped ${products.length} products from page ${currentPage} of ${categoryName}`);
-      
-      if (products.length > 0) {
-        console.log('Sample products:');
-    console.log(products.slice(0, 3));
-
-            // Save products to the category-specific collection
-        let savedCount = 0;
-        for (const product of products) {
-          try {
-            // Add category information to the product
-            const productWithCategory = {
-              ...product,
-              category: categoryName,
-              scrapedAt: new Date()
-            };
-            await Product.create(productWithCategory);
-            savedCount++;
-          } catch (error) {
-            console.error(`Error saving product:`, error.message);
-          }
-        }
-        console.log(`Successfully saved ${savedCount} products to database`);
-        totalProductsScraped += savedCount;
+            return { title: titleText, price: priceText, rating: ratingText, url };
+          }).filter(p => p.title && p.price);
+        }, { cardSelector, title, price, rating });
       } else {
-        console.log(`No products found for ${categoryName} on page ${currentPage}`);
+        products = await page.evaluate(({ cardSelector, title, price, rating }) => {
+          const cards = Array.from(document.querySelectorAll(cardSelector));
+          return cards.map(cardEl => {
+            const titleText = cardEl.querySelector(title)?.innerText?.trim() || '';
+            const priceText = cardEl.querySelector(price)?.innerText?.trim() || '';
+            const ratingText = cardEl.querySelector(rating)?.innerText?.trim() || '';
+            let url = cardEl.getAttribute('href') || cardEl.href || '';
+            if (url && !url.startsWith('http')) {
+              url = 'https://www.flipkart.com' + url;
+            }
+            return { title: titleText, price: priceText, rating: ratingText, url };
+          }).filter(p => p.title && p.price);
+        }, { cardSelector, title, price, rating });
       }
 
-      // Enhanced pagination check
-      hasNextPage = await page.evaluate(() => {
-        // Check multiple possible next button selectors
-        const validSelectors = [
-          'a._1LKTO3[rel="next"]',
-          'a[rel="next"]',
-          'a[aria-label="Next"]',
-          'a[href*="page="]'
-        ];
-        
-        for (const selector of validSelectors) {
-          try {
-            const element = document.querySelector(selector);
-            if (element && element.offsetParent !== null) { // Check if element is visible
-              return true;
+      if (products.length === 0) {
+        console.log('No products found with specific selectors, trying generic approach...');
+        products = await page.evaluate(() => {
+          const cards = Array.from(document.querySelectorAll('div[data-id], div[data-tkid]'));
+          return cards.map(cardEl => {
+            const titleEl = cardEl.querySelector('a.WKTcLC, a.wjcEIp, div.KzDlHZ, a[title]') || cardEl;
+            const titleText = titleEl?.innerText?.trim() || titleEl?.getAttribute('title') || '';
+            const priceEl = cardEl.querySelector('div.Nx9bqj, div._30jeq3, div._1_WHN1');
+            const priceText = priceEl?.innerText?.trim() || '';
+            const ratingEl = cardEl.querySelector('div.XQDdHH, div._3LWZlK, span._2_R_DZ');
+            const ratingText = ratingEl?.innerText?.trim() || '';
+            let url = '';
+            if (titleEl && titleEl.tagName === 'A') {
+              url = titleEl.getAttribute('href') || '';
+            } else {
+              const linkEl = cardEl.querySelector('a[href*="/p/"]');
+              url = linkEl?.getAttribute('href') || '';
             }
-          } catch (e) {
-            // Continue to next selector
-          }
-        }
-        
-        // Check for elements with "Next" text
-        const nextElements = Array.from(document.querySelectorAll('a, button, span')).filter(el => 
-          el.textContent && el.textContent.toLowerCase().includes('next') && el.offsetParent !== null
-        );
-        
-        if (nextElements.length > 0) {
-          return true;
-        }
-        
-        // Check if there are more products by looking for pagination info
-        const paginationText = document.body.innerText;
-        const pageMatches = paginationText.match(/Page \d+ of (\d+)/i) || 
-                           paginationText.match(/(\d+) pages?/i) ||
-                           paginationText.match(/showing \d+-\d+ of (\d+)/i);
-        
-        if (pageMatches) {
-          const totalPages = parseInt(pageMatches[1]);
-          const currentPageMatch = paginationText.match(/Page (\d+)/i);
-          const currentPageNum = currentPageMatch ? parseInt(currentPageMatch[1]) : 1;
-          return currentPageNum < totalPages;
-        }
-        
-        // Check if URL contains page parameter and try to increment
-        const url = window.location.href;
-        const pageMatch = url.match(/[?&]page=(\d+)/);
-        if (pageMatch) {
-          const currentPageNum = parseInt(pageMatch[1]);
-          // If we're on page 1 and found products, assume there might be more
-          return currentPageNum === 1 && document.querySelectorAll('div[data-id]').length > 0;
-        }
-        
-        return false;
-      });
-      
-      console.log(`Page ${currentPage} completed. Has next page: ${hasNextPage}`);
-      
-      // If no products found on current page, stop pagination
-      if (products.length === 0 && currentPage > 1) {
-        console.log(`No products found on page ${currentPage}, stopping pagination`);
-        hasNextPage = false;
+            if (url && !url.startsWith('http')) {
+              url = 'https://www.flipkart.com' + url;
+            }
+            return { title: titleText, price: priceText, rating: ratingText, url };
+          }).filter(p => p.title && p.price);
+        });
       }
-      
-    currentPage++;
-      
-      // Add delay between pages to avoid rate limiting
-      await new Promise(resolve => setTimeout(resolve, 3000));
+
+    } catch (error) {
+      console.error(`Error scraping products for ${name}:`, error.message);
+      products = [];
     }
-    
-    console.log(`\n=== ${categoryName} Scraping Complete ===`);
-    console.log(`Total pages scraped: ${currentPage - 1}`);
-    console.log(`Total products scraped: ${totalProductsScraped}`);
-    console.log(`==========================================\n`);
-    
-  } catch (error) {
-    console.error(`Error scraping ${categoryName}:`, error.message);
-  } finally {
-  await browser.close();
+
+    console.log(`Scraped ${products.length} products from page ${currentPage} of ${name}`);
+
+    if (products.length > 0) {
+      console.log('Sample products:');
+      console.log(products.slice(0, 3));
+
+      let savedCount = 0;
+      for (const product of products) {
+        try {
+          const productWithCategory = {
+            ...product,
+            category: name,
+            scrapedAt: new Date()
+          };
+          await ProductModel.create(productWithCategory);
+          savedCount++;
+        } catch (error) {
+          console.error(`Error saving product:`, error.message);
+        }
+      }
+      console.log(`Successfully saved ${savedCount} products to database`);
+      productsScrapedCount += savedCount;
+    } else {
+      console.log(`No products found for ${name} on page ${currentPage}`);
+    }
+
+    hasNextPage = await page.evaluate(() => {
+      const validSelectors = [
+        'a._1LKTO3[rel="next"]',
+        'a[rel="next"]',
+        'a[aria-label="Next"]',
+        'a[href*="page="]'
+      ];
+
+      for (const selector of validSelectors) {
+        try {
+          const element = document.querySelector(selector);
+          if (element && element.offsetParent !== null) {
+            return true;
+          }
+        } catch (e) {
+          // Continue to next selector
+        }
+      }
+
+      const nextElements = Array.from(document.querySelectorAll('a, button, span')).filter(el =>
+        el.textContent && el.textContent.toLowerCase().includes('next') && el.offsetParent !== null
+      );
+
+      if (nextElements.length > 0) {
+        return true;
+      }
+
+      const paginationText = document.body.innerText;
+      const pageMatches = paginationText.match(/Page \d+ of (\d+)/i) ||
+                         paginationText.match(/(\d+) pages?/i) ||
+                         paginationText.match(/showing \d+-\d+ of (\d+)/i);
+
+      if (pageMatches) {
+        const totalPages = parseInt(pageMatches[1]);
+        const currentPageMatch = paginationText.match(/Page (\d+)/i);
+        const currentPageNum = currentPageMatch ? parseInt(currentPageMatch[1]) : 1;
+        return currentPageNum < totalPages;
+      }
+
+      const url = window.location.href;
+      const pageMatch = url.match(/[?&]page=(\d+)/);
+      if (pageMatch) {
+        const currentPageNum = parseInt(pageMatch[1]);
+        return currentPageNum === 1 && document.querySelectorAll('div[data-id]').length > 0;
+      }
+
+      return false;
+    });
+
+    console.log(`Page ${currentPage} completed. Has next page: ${hasNextPage}`);
+
+    if (products.length === 0 && currentPage > 1) {
+      console.log(`No products found on page ${currentPage}, stopping pagination`);
+      hasNextPage = false;
+    }
+
+    currentPage++;
+
+    await new Promise(resolve => setTimeout(resolve, 3000));
   }
+  console.log(`Completed scraping for ${name}. Total products scraped: ${productsScrapedCount}`);
 }
