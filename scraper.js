@@ -7,6 +7,12 @@ import { closeLoginPopup } from './scraper-utils/closeLogin.js';
 import { cleanupCategoryUrls } from './scraper-utils/cleanupCategoryUrls.js';
 import {extractCategoriesFromPage} from './scraper-utils/extractCategoriesFromPage.js';
 
+const SPECIAL_CASE_CATEGORIES = new Set([
+  "Men Clothing",
+  "Women Clothing",
+  "Home & Kitchen",
+  "Appliances"
+]);
 // Function to detect pagination type
 async function detectPaginationType(page) {
   const paginationInfo = await page.evaluate(() => {
@@ -512,9 +518,3 @@ async function scrapeProductsForUrl(url, name, ProductModel, page, categorySelec
   }
   console.log(`Completed scraping for ${name}. Total products scraped: ${productsScrapedCount}`);
 }
-const SPECIAL_CASE_CATEGORIES = new Set([
-  "Men Clothing",
-  "Women Clothing",
-  "Home & Kitchen",
-  "Appliances"
-]);
