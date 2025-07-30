@@ -310,73 +310,30 @@ export async function fetchCategories() {
         console.log(`After final approach, found ${results.length} categories`);
       }
 
-      if (results.length < 8) {
-        console.log('Using hardcoded categories as last resort');
-
-        const hardcodedCategories = [
-          {
-            name: 'Minutes',
-            url: 'https://www.flipkart.com/flipkart-minutes-store?marketplace=HYPERLOCAL&fm=neo%2Fmerchandising&iid=M_498ef42f-84a9-44dc-bfa0-b5c50b6a1108_2_X1NCR146KC29_MC.HPVQFYHAHC9Q&otracker=hp_rich_navigation_1_2.navigationCard.RICH_NAVIGATION_Minutes_HPVQFYHAHC9Q&otracker1=hp_rich_navigation_PINNED_neo%2Fmerchandising_NA_NAV_EXPANDABLE_navigationCard_cc_1_L0_view-all&cid=HPVQFYHAHC9Q',
-            img: 'https://rukminim2.flixcart.com/fk-p-flap/128/128/image/a22a213ca6221b65.png?q=100'
-          },
-          {
-            name: 'Mobiles & Tablets',
-            url: 'https://www.flipkart.com/mobile-phones-store?param=4111&fm=neo%2Fmerchandising&iid=M_498ef42f-84a9-44dc-bfa0-b5c50b6a1108_2_X1NCR146KC29_MC.AH1NTIJZ241Z&otracker=hp_rich_navigation_2_2.navigationCard.RICH_NAVIGATION_Mobiles%2B%26%2BTablets_AH1NTIJZ241Z&otracker1=hp_rich_navigation_PINNED_neo%2Fmerchandising_NA_NAV_EXPANDABLE_navigationCard_cc_2_L0_view-all&cid=AH1NTIJZ241Z',
-            img: 'https://rukminim2.flixcart.com/fk-p-flap/128/128/image/5f2ee7f883cdb774.png?q=100'
-          },
-          {
-            name: 'Fashion',
-            url: 'https://www.flipkart.com/clothing-and-accessories/pr?sid=clo',
-            img: 'https://rukminim2.flixcart.com/fk-p-flap/128/128/image/ff559cb9d803d424.png?q=100'
-          },
-          {
-            name: 'Electronics',
-            url: 'https://www.flipkart.com/electronics-store',
-            img: 'https://rukminim2.flixcart.com/fk-p-flap/128/128/image/af646c36d74c4be9.png?q=100'
-          },
-          {
-            name: 'Home & Furniture',
-            url: 'https://www.flipkart.com/home-furnishing/pr?sid=jra',
-            img: 'https://rukminim2.flixcart.com/fk-p-flap/128/128/image/1788f177649e6991.png?q=100'
-          },
-          {
-            name: 'TVs & Appliances',
-            url: 'https://www.flipkart.com/fk-sasalele-sale-tv-and-appliances-may25-at-store?param=3783&fm=neo%2Fmerchandising&iid=M_498ef42f-84a9-44dc-bfa0-b5c50b6a1108_2_X1NCR146KC29_MC.YX88A89LFA7C&otracker=hp_rich_navigation_6_2.navigationCard.RICH_NAVIGATION_TVs%2B%26%2BAppliances_YX88A89LFA7C&otracker1=hp_rich_navigation_PINNED_neo%2Fmerchandising_NA_NAV_EXPANDABLE_navigationCard_cc_6_L0_view-all&cid=YX88A89LFA7C',
-            img: 'https://rukminim2.flixkart.com/fk-p-flap/128/128/image/e90944802d996756.jpg?q=100'
-          },
-          {
-            name: 'Flight Bookings',
-            url: 'https://www.flipkart.com/travel/flights?param=bsd-2025-booknow&fm=neo%2Fmerchandising&iid=M_498ef42f-84a9-44dc-bfa0-b5c50b6a1108_2_X1NCR146KC29_MC.LE8A9JOLY9F3&otracker=hp_rich_navigation_7_2.navigationCard.RICH_NAVIGATION_Flight%2BBookings_LE8A9JOLY9F3&otracker1=hp_rich_navigation_PINNED_neo%2Fmerchandising_NA_NAV_EXPANDABLE_navigationCard_cc_7_L0_view-all&cid=LE8A9JOLY9F3',
-            img: null
-          },
-          {
-            name: 'Beauty, Food..',
-            url: 'https://www.flipkart.com/beauty-and-grooming/pr?sid=g9b',
-            img: null
-          },
-          {
-            name: 'Grocery',
-            url: 'https://www.flipkart.com/grocery-supermart-store?marketplace=GROCERY&fm=neo%2Fmerchandising&iid=M_498ef42f-84a9-44dc-bfa0-b5c50b6a1108_2_X1NCR146KC29_MC.XO8YX5A5U8SC&otracker=hp_rich_navigation_9_2.navigationCard.RICH_NAVIGATION_Grocery_XO8YX5A5U8SC&otracker1=hp_rich_navigation_PINNED_neo%2Fmerchandising_NA_NAV_EXPANDABLE_navigationCard_cc_9_L0_view-all&cid=XO8YX5A5U8SC',
-            img: null
-          }
-        ];
-
-        for (const cat of hardcodedCategories) {
-          const existingCat = results.find(r => r.name === cat.name);
-          if (!existingCat) {
-
-            results.push(cat);
-          } else {
-            if (!existingCat.url && cat.url) {
-              existingCat.url = cat.url;
-            }
-            if (!existingCat.img && cat.img) {
-              existingCat.img = cat.img;
-            }
-          }
-        }
-
-        console.log(`After adding hardcoded categories, found ${results.length} categories`);
+      if (results.length < 5) {
+        console.log('Trying more aggressive category detection...');
+        
+        const additionalCategories = page.evaluate(() => {
+          const candidates = Array.from(document.querySelectorAll('a, div[role="button"]'))
+            .filter(el => {
+              const img = el.querySelector('img');
+              const text = el.textContent.trim();
+              return img && text && text.length > 2 && text.length < 40 && el.href;
+            })
+            .map(el => ({
+              name: el.textContent.trim(),
+              url: el.href,
+              img: el.querySelector('img')?.src || null
+            }))
+            .filter((item, index, arr) => 
+              arr.findIndex(x => x.name === item.name) === index
+            );
+          
+          return candidates;
+        });
+        
+        results.push(...additionalCategories);
+        console.log(`After aggressive detection, found ${results.length} categories`);
       }
 
       return results;
