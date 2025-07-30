@@ -330,7 +330,7 @@ async function scrapeProductsForUrl(url, name, ProductModel, page, categorySelec
     let products = [];
 
     try {
-      if (["Men Clothing", "Women Clothing", "Home & Kitchen", "Appliances"].includes(name)) {
+      if (SPECIAL_CASE_CATEGORIES.has(name)) {
         products = await page.evaluate((categoryCardSelector) => {
           const rows = Array.from(document.querySelectorAll('div.cPHDOP.col-12-12'));
           let allProducts = [];
@@ -512,3 +512,9 @@ async function scrapeProductsForUrl(url, name, ProductModel, page, categorySelec
   }
   console.log(`Completed scraping for ${name}. Total products scraped: ${productsScrapedCount}`);
 }
+const SPECIAL_CASE_CATEGORIES = new Set([
+  "Men Clothing",
+  "Women Clothing",
+  "Home & Kitchen",
+  "Appliances"
+]);
