@@ -429,22 +429,23 @@ async function scrapeProductsForUrl(url, name, ProductModel, page, categorySelec
       console.log('Sample products:');
       console.log(products.slice(0, 3));
 
-      let savedCount = 0;
-      for (const product of products) {
-        try {
-          const productWithCategory = {
-            ...product,
-            category: name,
-            scrapedAt: new Date()
-          };
-          await ProductModel.create(productWithCategory);
-          savedCount++;
-        } catch (error) {
-          console.error(`Error saving product:`, error.message);
+    try {
+        const productsWithMetadata = products.map(product => ({
+          ...product,
+          category: name,
+          scrapedAt: new Date()
+        }));
+
+        const result = await ProductModel.insertMany(productsWithMetadata, { ordered: false });
+
+        console.log(`✅ Saved ${result.length} products for category "${name}".`);
+      } catch (error) {
+        console.error('❌ Error during batch insert:', error.message);
+
+        if (error.writeErrors?.length) {
+          console.error(`⚠️ Skipped ${error.writeErrors.length} products due to validation or duplication errors.`);
         }
       }
-      console.log(`Successfully saved ${savedCount} products to database`);
-      productsScrapedCount += savedCount;
     } else {
       console.log(`No products found for ${name} on page ${currentPage}`);
     }
