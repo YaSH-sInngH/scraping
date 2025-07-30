@@ -28,7 +28,7 @@ const productSchema = new mongoose.Schema({
     trim: true,
     index: true,
   },
-  scrapedAt: {
+  scrapeAt: {
     type: Date,
     default: Date.now,
   }
