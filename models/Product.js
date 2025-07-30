@@ -27,10 +27,6 @@ const productSchema = new mongoose.Schema({
     required: true,
     trim: true,
     index: true,
-  },
-  scrapeAt: {
-    type: Date,
-    default: Date.now,
   }
 });
 
