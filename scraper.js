@@ -145,20 +145,6 @@ async function handleInfiniteScroll(page, maxScrolls = 10) {
   console.log(`Infinite scroll completed after ${scrollCount} scrolls`);
 }
 
-async function getHardcodedCategories(categoryObject) {
-  const fallbacks = {
-    'Fashion': 'https://www.flipkart.com/clothing-and-accessories/pr?sid=clo',
-    'Electronics': 'https://www.flipkart.com/electronics-store',
-    'Home & Furniture': 'https://www.flipkart.com/home-furnishing/pr?sid=jra',
-    'Beauty, Food..': 'https://www.flipkart.com/beauty-and-grooming/pr?sid=g9b',
-  };
-
-  for (const [key, fallbackUrl] of Object.entries(fallbacks)) {
-    if (categoryObject[key] && !categoryObject[key].url) {
-      categoryObject[key].url = fallbackUrl;
-    }
-  }
-}
 export async function fetchCategories() {
   const browser = await puppeteer.launch({
     headless: true,
@@ -184,8 +170,6 @@ export async function fetchCategories() {
     categories.forEach(category => {
       categoryObject[category.name] = category;
     });
-
-    getHardcodedCategories(categoryObject);
     cleanupCategoryUrls(categoryObject);
 
     fs.writeFileSync(filePath, JSON.stringify(categoryObject, null, 2));

@@ -1,0 +1,47 @@
+{
+  "Minutes": {
+    "name": "Minutes",
+    "url": "https://www.flipkart.com/flipkart-minutes-store?marketplace=HYPERLOCAL&fm=neo%2Fmerchandising&iid=M_adc37aeb-843a-4d15-b8f8-b1ca98c26faf_2_X1NCR146KC29_MC.HPVQFYHAHC9Q&otracker=hp_rich_navigation_1_2.navigationCard.RICH_NAVIGATION_Minutes_HPVQFYHAHC9Q&otracker1=hp_rich_navigation_PINNED_neo%2Fmerchandising_NA_NAV_EXPANDABLE_navigationCard_cc_1_L0_view-all&cid=HPVQFYHAHC9Q",
+    "img": "https://rukminim2.flixcart.com/fk-p-flap/128/128/image/a22a213ca6221b65.png?q=100"
+  },
+  "Mobiles & Tablets": {
+    "name": "Mobiles & Tablets",
+    "url": "https://www.flipkart.com/mobile-phones-store?param=4111&fm=neo%2Fmerchandising&iid=M_adc37aeb-843a-4d15-b8f8-b1ca98c26faf_2_X1NCR146KC29_MC.AH1NTIJZ241Z&otracker=hp_rich_navigation_2_2.navigationCard.RICH_NAVIGATION_Mobiles%2B%26%2BTablets_AH1NTIJZ241Z&otracker1=hp_rich_navigation_PINNED_neo%2Fmerchandising_NA_NAV_EXPANDABLE_navigationCard_cc_2_L0_view-all&cid=AH1NTIJZ241Z",
+    "img": "https://rukminim2.flixcart.com/fk-p-flap/128/128/image/5f2ee7f883cdb774.png?q=100"
+  },
+  "Fashion": {
+    "name": "Fashion",
+    "url": null,
+    "img": "https://rukminim2.flixcart.com/fk-p-flap/128/128/image/ff559cb9d803d424.png?q=100"
+  },
+  "Electronics": {
+    "name": "Electronics",
+    "url": null,
+    "img": "https://rukminim2.flixcart.com/fk-p-flap/128/128/image/af646c36d74c4be9.png?q=100"
+  },
+  "Home & Furniture": {
+    "name": "Home & Furniture",
+    "url": null,
+    "img": "https://rukminim2.flixcart.com/fk-p-flap/128/128/image/1788f177649e6991.png?q=100"
+  },
+  "TVs & Appliances": {
+    "name": "TVs & Appliances",
+    "url": "https://www.flipkart.com/fk-sasalele-sale-tv-and-appliances-may25-at-store?param=3783&fm=neo%2Fmerchandising&iid=M_adc37aeb-843a-4d15-b8f8-b1ca98c26faf_2_X1NCR146KC29_MC.YX88A89LFA7C&otracker=hp_rich_navigation_6_2.navigationCard.RICH_NAVIGATION_TVs%2B%26%2BAppliances_YX88A89LFA7C&otracker1=hp_rich_navigation_PINNED_neo%2Fmerchandising_NA_NAV_EXPANDABLE_navigationCard_cc_6_L0_view-all&cid=YX88A89LFA7C",
+    "img": "https://rukminim2.flixcart.com/fk-p-flap/128/128/image/e90944802d996756.jpg?q=100"
+  },
+  "Flight Bookings": {
+    "name": "Flight Bookings",
+    "url": "https://www.flipkart.com/travel/flights?param=bsd-2025-booknow&fm=neo%2Fmerchandising&iid=M_adc37aeb-843a-4d15-b8f8-b1ca98c26faf_2_X1NCR146KC29_MC.LE8A9JOLY9F3&otracker=hp_rich_navigation_7_2.navigationCard.RICH_NAVIGATION_Flight%2BBookings_LE8A9JOLY9F3&otracker1=hp_rich_navigation_PINNED_neo%2Fmerchandising_NA_NAV_EXPANDABLE_navigationCard_cc_7_L0_view-all&cid=LE8A9JOLY9F3",
+    "img": null
+  },
+  "Beauty, Food..": {
+    "name": "Beauty, Food..",
+    "url": null,
+    "img": null
+  },
+  "Grocery": {
+    "name": "Grocery",
+    "url": "https://www.flipkart.com/grocery-supermart-store?marketplace=GROCERY&fm=neo%2Fmerchandising&iid=M_adc37aeb-843a-4d15-b8f8-b1ca98c26faf_2_X1NCR146KC29_MC.XO8YX5A5U8SC&otracker=hp_rich_navigation_9_2.navigationCard.RICH_NAVIGATION_Grocery_XO8YX5A5U8SC&otracker1=hp_rich_navigation_PINNED_neo%2Fmerchandising_NA_NAV_EXPANDABLE_navigationCard_cc_9_L0_view-all&cid=XO8YX5A5U8SC",
+    "img": null
+  }
+}
