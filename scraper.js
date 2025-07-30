@@ -71,7 +71,7 @@ async function findWorkingSelectors(page, categoryName) {
     'div.cPHDOP',
     'a.CGtC98',
     'div._1sdMkc',
-    'div.slAVV4.qt3Pmj' // Keep this specific selector
+    'div.slAVV4.qt3Pmj'
   ];
 
   const foundSelectors = await page.evaluate((selectors) => {
@@ -98,7 +98,7 @@ async function findWorkingSelectors(page, categoryName) {
   let maxCount = 0;
   
   for (const [selector, count] of Object.entries(foundSelectors)) {
-    if (count > maxCount && count > 5) { // At least 5 products
+    if (count > maxCount && count > 5) { 
       maxCount = count;
       bestCardSelector = selector;
     }
@@ -116,7 +116,7 @@ async function handleInfiniteScroll(page, maxScrolls = 10) {
   while (scrollCount < maxScrolls) {
     // Get current product count, preferring data-id as a robust product card identifier
     const currentProductCount = await page.evaluate(() => {
-      return document.querySelectorAll('div[data-id]').length;  // Line 110
+      return document.querySelectorAll('div[data-id]').length;
     });
     
     console.log(`Scroll ${scrollCount + 1}: Found ${currentProductCount} products`);
@@ -198,6 +198,7 @@ export async function fetchCategories() {
 
   return Object.values(categoryObject);
 }
+
 export default async function scrapeCategory(categoryUrl, categoryName) {
   try {
   await connectDB();
