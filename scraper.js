@@ -71,7 +71,7 @@ async function findWorkingSelectors(page, categoryName) {
     'div.cPHDOP',
     'a.CGtC98',
     'div._1sdMkc',
-    'div.slAVV4.qt3Pmj'
+    'div.slAVV4.qt3Pmj' // Keep this specific selector
   ];
 
   const foundSelectors = await page.evaluate((selectors) => {
@@ -98,7 +98,7 @@ async function findWorkingSelectors(page, categoryName) {
   let maxCount = 0;
   
   for (const [selector, count] of Object.entries(foundSelectors)) {
-    if (count > maxCount && count > 5) { 
+    if (count > maxCount && count > 5) { // At least 5 products
       maxCount = count;
       bestCardSelector = selector;
     }
@@ -116,7 +116,7 @@ async function handleInfiniteScroll(page, maxScrolls = 10) {
   while (scrollCount < maxScrolls) {
     // Get current product count, preferring data-id as a robust product card identifier
     const currentProductCount = await page.evaluate(() => {
-      return document.querySelectorAll('div[data-id]').length;
+      return document.querySelectorAll('div[data-id]').length;  // Line 110
     });
     
     console.log(`Scroll ${scrollCount + 1}: Found ${currentProductCount} products`);
@@ -145,6 +145,20 @@ async function handleInfiniteScroll(page, maxScrolls = 10) {
   console.log(`Infinite scroll completed after ${scrollCount} scrolls`);
 }
 
+async function getHardcodedCategories(categoryObject) {
+  const fallbacks = {
+    'Fashion': 'https://www.flipkart.com/clothing-and-accessories/pr?sid=clo',
+    'Electronics': 'https://www.flipkart.com/electronics-store',
+    'Home & Furniture': 'https://www.flipkart.com/home-furnishing/pr?sid=jra',
+    'Beauty, Food..': 'https://www.flipkart.com/beauty-and-grooming/pr?sid=g9b',
+  };
+
+  for (const [key, fallbackUrl] of Object.entries(fallbacks)) {
+    if (categoryObject[key] && !categoryObject[key].url) {
+      categoryObject[key].url = fallbackUrl;
+    }
+  }
+}
 export async function fetchCategories() {
   const browser = await puppeteer.launch({
     headless: true,
@@ -170,6 +184,8 @@ export async function fetchCategories() {
     categories.forEach(category => {
       categoryObject[category.name] = category;
     });
+
+    getHardcodedCategories(categoryObject);
     cleanupCategoryUrls(categoryObject);
 
     fs.writeFileSync(filePath, JSON.stringify(categoryObject, null, 2));
@@ -182,7 +198,6 @@ export async function fetchCategories() {
 
   return Object.values(categoryObject);
 }
-
 export default async function scrapeCategory(categoryUrl, categoryName) {
   try {
   await connectDB();
@@ -193,11 +208,6 @@ export default async function scrapeCategory(categoryUrl, categoryName) {
   const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
   const Product = getProductModel(categoryName);
-
-  let currentPage = 1;
-  let hasNextPage = true;
-  let totalProductsScraped = 0;
-  const maxPages = 50; // Safety limit to prevent infinite loops
   
   // Load selectors from the file, or use a default empty object
   let categorySelectors = {};
@@ -222,13 +232,7 @@ export default async function scrapeCategory(categoryUrl, categoryName) {
     // Scrape subcategories first
     await page.goto(categoryUrl, { waitUntil: 'networkidle2', timeout: 60000 });
     // Close login popup if present
-    try {
-      await page.waitForSelector('button._2KpZ6l._2doB4z', { timeout: 5000 });
-      await page.click('button._2KpZ6l._2doB4z');
-      console.log('Closed login popup');
-    } catch (e) {
-      // No popup found, continue
-    }
+    await closeLoginPopup(page);
 
     const subcategories = await page.evaluate(() => {
       let links = Array.from(document.querySelectorAll('section.Iu4qXa a.uWfXeF, section.Iu4qXa a.hEjLuS.WyLc0s'));
@@ -244,7 +248,6 @@ export default async function scrapeCategory(categoryUrl, categoryName) {
     if (subcategories.length > 0) {
       console.log(`Found ${subcategories.length} subcategories for ${categoryName}.`);
       dynamicSubCategoryMapping[categoryName] = subcategories;
-      fs.writeFileSync(subCategoryMappingPath, JSON.stringify(dynamicSubCategoryMapping, null, 2));
 
       for (const sub of subcategories) {
         console.log(`Scraping subcategory: ${sub.name} from ${sub.url}`);
@@ -253,14 +256,14 @@ export default async function scrapeCategory(categoryUrl, categoryName) {
       }
     } else {
       console.log(`No subcategories found for ${categoryName}, scraping products directly.`);
-      dynamicSubCategoryMapping[categoryName] = []; // Ensure the category has an entry even if no subcategories
-      fs.writeFileSync(subCategoryMappingPath, JSON.stringify(dynamicSubCategoryMapping, null, 2));
+      dynamicSubCategoryMapping[categoryName] = []; 
       await scrapeProductsForUrl(categoryUrl, categoryName, Product, page, categorySelectors);
     }
+    fs.writeFileSync(subCategoryMappingPath, JSON.stringify(dynamicSubCategoryMapping, null, 2));
+
 
     console.log(`\n=== ${categoryName} Scraping Complete ===`);
-    console.log(`Total pages scraped: ${currentPage - 1}`); // This will be inaccurate if subcategories are scraped
-    console.log(`Total products scraped: ${totalProductsScraped}`); // This will also be inaccurate
+    console.log(`Completed scraping for category "${categoryName}" and its subcategories.`);
     console.log(`==========================================\n`);
 
   } catch (error) {
@@ -284,13 +287,7 @@ async function scrapeProductsForUrl(url, name, ProductModel, page, categorySelec
     await page.goto(pageUrl, { waitUntil: 'networkidle2', timeout: 60000 });
 
     // Close login popup if present
-    try {
-      await page.waitForSelector('button._2KpZ6l._2doB4z', { timeout: 5000 });
-      await page.click('button._2KpZ6l._2doB4z');
-      console.log('Closed login popup');
-    } catch (e) {
-      // No popup found, continue
-    }
+    await closeLoginPopup(page);
 
     const paginationType = await detectPaginationType(page);
 
